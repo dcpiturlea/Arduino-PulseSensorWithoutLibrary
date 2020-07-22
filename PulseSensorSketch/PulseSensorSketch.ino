@@ -18,6 +18,11 @@ int minBPM =45;   //puls minim
 int maxBPM = 200; //puls maxim
 boolean wasfirstPulse = false; //variabila care devine true la prima bataie de inima
 int pulseInterval = 0;
+int countCalculationBPM = 0;
+int lastBPM = 0;
+
+
+
 // Setarile programului(ruleaza o singura data)
 void setup() {
   pinMode(LED13,OUTPUT);         // pinul va aprinde si va stinge ledul la fiecare bataie a inimii(pin 13)
@@ -39,19 +44,26 @@ void loop() {
 
     
   if (ThisTime - lastTimeFromCalculationBpm>=15000 && wasBPM == true  && minBPM > 44 && maxBPM <201){
+       if (countCalculationBPM==0){
         BPM = (countBP *4);
+        }
+       
+       if (countCalculationBPM>1){
+        BPM = ((countBP *4)+lastBPM)/2;
+       }       
+        countCalculationBPM = countCalculationBPM+1;
         lastTimeFromCalculationBpm = millis();
-        countBP = 0;
-        Serial.println("BPM: " + String(BPM));  
-      }
-
+        countBP=0;
+        lastBPM = BPM; 
+        Serial.println("BPM: " + String(BPM));
+  }
   
    if(Signal > Threshold+50 && wasBPM == false){ //Cand senzorul analog primeste un semnal peste 600 se aduna o bataie, daca wasBPM este true
     countBP=countBP+1;
     digitalWrite(LED13,HIGH);
     tone(8, 960);
     wasBPM = true;
-   // Serial.println("Batai inima: " + String(countBP));
+    Serial.println("Batai inima: " + String(countBP));
   
    // BPM=ThisTime-LastTime;
     //BPM=int(60/(float(BPM)/1000));
